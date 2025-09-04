@@ -21,7 +21,9 @@ const MIN_BALANCE = process.env.RANDOMIZER_MIN_BALANCE || 0.01
 const NETWORK =
 	_spliceFromArgs(process.argv, `--network`) || process.env.RANDOMIZER_NETWORK
 const POLLING_MSECS = process.env.RANDOMIZER_POLLING_MSECS || 15000
-const GATEWAY_IP = process.env.RANDOMIZER_GATEWAY_IP || "127.0.0.1"
+const GATEWAY_HOST = (
+    _spliceFromArgs(process.argv, `--host`) || process.env.RANDOMIZER_GATEWAY_HOST || "127.0.0.1"
+).replace(/\/$/, "")
 const GATEWAY_PORT =
 	_parseIntFromArgs(process.argv, `--port`) ||
 	process.env.RANDOMIZER_GATEWAY_PORT
@@ -35,15 +37,18 @@ const TARGET =
 main()
 
 async function main() {
-	console.info(`EVM RANDOMIZER v${require("../package.json").version}`)
-	console.info("=".repeat(80))
+    const headline = `EVM RANDOMIZER v${require("../package.json").version}`
+	console.info("=".repeat(headline.length))
+    console.info(headline)
 
 	if (!GATEWAY_PORT) throw new Error(`Fatal: no PORT was specified.`)
 	else if (!TARGET) throw new Error(`Fatal: no TARGET was specified.`)
 
+    console.info(`> Ethereum gateway: ${GATEWAY_HOST}:${GATEWAY_PORT}`)
+
 	const witOracle = SIGNER
-		? await WitOracle.fromJsonRpcUrl(`http://${GATEWAY_IP}:${GATEWAY_PORT}`, SIGNER)
-		: await WitOracle.fromJsonRpcUrl(`http://${GATEWAY_IP}:${GATEWAY_PORT}`)
+		? await WitOracle.fromJsonRpcUrl(`http://${GATEWAY_HOST}:${GATEWAY_PORT}`, SIGNER)
+		: await WitOracle.fromJsonRpcUrl(`http://${GATEWAY_HOST}:${GATEWAY_PORT}`)
 	const { network, provider, signer } = witOracle
 
 	if (NETWORK && network !== NETWORK) {
