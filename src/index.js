@@ -21,7 +21,8 @@ const MIN_BALANCE = process.env.RANDOMIZER_MIN_BALANCE || 0.01
 const NETWORK =
 	_spliceFromArgs(process.argv, `--network`) || process.env.RANDOMIZER_NETWORK
 const POLLING_MSECS = process.env.RANDOMIZER_POLLING_MSECS || 15000
-const PORT =
+const GATEWAY_IP = process.env.RANDOMIZER_GATEWAY_IP || "127.0.0.1"
+const GATEWAY_PORT =
 	_parseIntFromArgs(process.argv, `--port`) ||
 	process.env.RANDOMIZER_GATEWAY_PORT
 const SIGNER =
@@ -37,12 +38,12 @@ async function main() {
 	console.info(`EVM RANDOMIZER v${require("../package.json").version}`)
 	console.info("=".repeat(80))
 
-	if (!PORT) throw new Error(`Fatal: no PORT was specified.`)
+	if (!GATEWAY_PORT) throw new Error(`Fatal: no PORT was specified.`)
 	else if (!TARGET) throw new Error(`Fatal: no TARGET was specified.`)
 
 	const witOracle = SIGNER
-		? await WitOracle.fromJsonRpcUrl(`http://127.0.0.1:${PORT}`, SIGNER)
-		: await WitOracle.fromJsonRpcUrl(`http://127.0.0.1:${PORT}`)
+		? await WitOracle.fromJsonRpcUrl(`http://${GATEWAY_IP}:${GATEWAY_PORT}`, SIGNER)
+		: await WitOracle.fromJsonRpcUrl(`http://${GATEWAY_IP}:${GATEWAY_PORT}`)
 	const { network, provider, signer } = witOracle
 
 	if (NETWORK && network !== NETWORK) {
