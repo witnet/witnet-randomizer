@@ -16,8 +16,8 @@ const commas = (number) => {
 const CHECK_BALANCE_SECS = process.env.RANDOMIZER_CHECK_BALANCE_SECS
 const CONFIRMATIONS = process.env.RANDOMIZER_CONFIRMATIONS || 2
 const GAS_PRICE = process.env.RANDOMIZER_GAS_PRICE
-const HEARTBEAT_SECS = process.env.RANDOMIZER_HEARBEAT_SECS || 300
-const MIN_BALANCE = process.env.RANDOMIZER_MIN_BALANCE || 0.01
+const HEARTBEAT_SECS = process.env.RANDOMIZER_HEARBEAT_SECS || 3600
+const MIN_BALANCE = process.env.RANDOMIZER_MIN_BALANCE || 0
 const NETWORK =
 	_spliceFromArgs(process.argv, `--network`) || process.env.RANDOMIZER_NETWORK
 const POLLING_MSECS = process.env.RANDOMIZER_POLLING_MSECS || 15000
