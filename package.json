@@ -27,10 +27,10 @@
 	],
 	"devDependencies": {
 		"@biomejs/biome": "^2.2.2",
-    "ethrpc-gateway": "^2.2.8"
+    	"ethrpc-gateway": "^2.2.8"
 	},
 	"dependencies": {
-		"@witnet/ethers": "^1.0.5-beta.1",
+		"@witnet/ethers": "^1.0.5",
 		"cross-env": "^7.0.3",
 		"dotenv": "^16.6.1",
 		"moment": "^2.30.1",
