@@ -22,7 +22,7 @@ const NETWORK =
 	_spliceFromArgs(process.argv, `--network`) || process.env.RANDOMIZER_NETWORK
 const POLLING_MSECS = process.env.RANDOMIZER_POLLING_MSECS || 15000
 const GATEWAY_HOST = (
-    _spliceFromArgs(process.argv, `--host`) || process.env.RANDOMIZER_GATEWAY_HOST || "127.0.0.1"
+    _spliceFromArgs(process.argv, `--host`) || process.env.RANDOMIZER_GATEWAY_HOST || "http://127.0.0.1"
 ).replace(/\/$/, "")
 const GATEWAY_PORT =
 	_parseIntFromArgs(process.argv, `--port`) ||
@@ -47,8 +47,8 @@ async function main() {
     console.info(`> Ethereum gateway: ${GATEWAY_HOST}:${GATEWAY_PORT}`)
 
 	const witOracle = SIGNER
-		? await WitOracle.fromJsonRpcUrl(`http://${GATEWAY_HOST}:${GATEWAY_PORT}`, SIGNER)
-		: await WitOracle.fromJsonRpcUrl(`http://${GATEWAY_HOST}:${GATEWAY_PORT}`)
+		? await WitOracle.fromJsonRpcUrl(`${GATEWAY_HOST}:${GATEWAY_PORT}`, SIGNER)
+		: await WitOracle.fromJsonRpcUrl(`${GATEWAY_HOST}:${GATEWAY_PORT}`)
 	const { network, provider, signer } = witOracle
 
 	if (NETWORK && network !== NETWORK) {
