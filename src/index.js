@@ -15,14 +15,16 @@ const commas = (number) => {
 
 const CHECK_BALANCE_SECS = process.env.RANDOMIZER_CHECK_BALANCE_SECS
 const CONFIRMATIONS = process.env.RANDOMIZER_CONFIRMATIONS || 2
-const GAS_PRICE = process.env.RANDOMIZER_GAS_PRICE
+const MAX_GAS_PRICE_GWEI = process.env.RANDOMIZER_MAX_GAS_PRICE_GWEI
 const HEARTBEAT_SECS = process.env.RANDOMIZER_HEARBEAT_SECS || 3600
 const MIN_BALANCE = process.env.RANDOMIZER_MIN_BALANCE || 0
 const NETWORK =
 	_spliceFromArgs(process.argv, `--network`) || process.env.RANDOMIZER_NETWORK
 const POLLING_MSECS = process.env.RANDOMIZER_POLLING_MSECS || 15000
 const GATEWAY_HOST = (
-    _spliceFromArgs(process.argv, `--host`) || process.env.RANDOMIZER_GATEWAY_HOST || "http://127.0.0.1"
+	_spliceFromArgs(process.argv, `--host`) ||
+	process.env.RANDOMIZER_GATEWAY_HOST ||
+	"http://127.0.0.1"
 ).replace(/\/$/, "")
 const GATEWAY_PORT =
 	_parseIntFromArgs(process.argv, `--port`) ||
@@ -37,14 +39,14 @@ const TARGET =
 main()
 
 async function main() {
-    const headline = `EVM RANDOMIZER v${require("../package.json").version}`
-	console.info("=".repeat(headline.length))
-    console.info(headline)
+	const headline = `EVM RANDOMIZER v${require("../package.json").version}`
+	console.info("=".repeat(120))
+	console.info(headline)
 
 	if (!GATEWAY_PORT) throw new Error(`Fatal: no PORT was specified.`)
 	else if (!TARGET) throw new Error(`Fatal: no TARGET was specified.`)
 
-    console.info(`> Ethereum gateway: ${GATEWAY_HOST}:${GATEWAY_PORT}`)
+	console.info(`> Ethereum gateway: ${GATEWAY_HOST}:${GATEWAY_PORT}`)
 
 	const witOracle = SIGNER
 		? await WitOracle.fromJsonRpcUrl(`${GATEWAY_HOST}:${GATEWAY_PORT}`, SIGNER)
@@ -94,6 +96,11 @@ async function main() {
 	console.info(`> Signer address: ${signer.address}`)
 	setInterval(checkBalance, (CHECK_BALANCE_SECS || 900) * 1000)
 
+	// max acceptable gas price
+	if (MAX_GAS_PRICE_GWEI) {
+		console.info(`> Max gas price:  ${commas(MAX_GAS_PRICE_GWEI)} gwei`)
+	}
+
 	// randomize upon startup:
 	console.info(`> Randomizing every ${HEARTBEAT_SECS} seconds ... `)
 	randomize()
@@ -120,12 +127,24 @@ async function main() {
 
 	async function randomize() {
 		lastClock = Date.now()
-		console.info(`> Randomizing new block ...`)
+
 		let isRandomized = false
+		const feeData = await randomizer.provider.getFeeData()
+		if (Number(feeData.gasPrice) / 10 ** 9 > MAX_GAS_PRICE_GWEI) {
+			console.info(
+				`> Postponing randomize as current network gas price is too high: ${commas(
+					Number(feeData.gasPrice) / 10 ** 9,
+				)} gwei > ${commas(MAX_GAS_PRICE_GWEI)} gwei`,
+			)
+			setTimeout(randomize, POLLING_MSECS)
+			return
+		} else {
+			console.info(`> Randomizing new block ...`)
+		}
 		randomizer
 			.randomize({
 				evmConfirmations: CONFIRMATIONS || 2,
-				evmGasPrice: GAS_PRICE || undefined,
+				evmGasPrice: feeData.gasPrice,
 			})
 			.then(async (receipt) => {
 				console.info(`  - Block number:  ${commas(receipt.blockNumber)}`)
