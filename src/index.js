@@ -121,6 +121,7 @@ async function main() {
 	async function randomize() {
 		lastClock = Date.now()
 		console.info(`> Randomizing new block ...`)
+		let isRandomized = false
 		randomizer
 			.randomize({
 				evmConfirmations: CONFIRMATIONS || 2,
@@ -169,6 +170,7 @@ async function main() {
 					interval: POLLING_MSECS,
 				}).then(async (result) => {
 					if (result.isRandomized) {
+						isRandomized = true
 						console.info(`> Randomized block ${commas(receipt.blockNumber)}:`)
 						const trails = await randomizer.fetchRandomnessAfterProof(
 							receipt.blockNumber,
@@ -207,7 +209,19 @@ async function main() {
 			})
 			.catch((err) => {
 				console.error(err)
-				process.exit(0)
+				if (isRandomized) {
+					const elapsed = Date.now() - lastClock
+					const timeout = Math.max(0, HEARTBEAT_SECS * 1000 - elapsed)
+					console.info(
+						`> Waiting ${Number(timeout / 1000).toFixed(1)} seconds before next randomize ...`,
+					)
+					setTimeout(randomize, timeout)
+				} else {
+					console.info(
+						`> Retrying in ${Math.floor(POLLING_MSECS / 1000)} seconds before next randomize ...`,
+					)
+					setTimeout(randomize, POLLING_MSECS)
+				}
 			})
 	}
 }
