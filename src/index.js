@@ -66,9 +66,7 @@ async function main() {
 	const symbol = utils.getEvmNetworkSymbol(network)
 	const version = await randomizer.getEvmImplVersion()
 
-	console.info(
-		`> ${artifact}:${" ".repeat(Math.max(0, 16 - artifact.length))} ${TARGET} [${version}]`,
-	)
+	console.info(`> ${artifact}:${" ".repeat(Math.max(0, 16 - artifact.length))} ${TARGET} [${version}]`)
 
 	let randomizeWaitBlocks
 	if (artifact === "WitRandomnessV3") {
@@ -88,18 +86,18 @@ async function main() {
 		)
 		process.exit(1)
 	}
-
-	// check balance periodically
-	console.info(
-		`> Checking balance every ${CHECK_BALANCE_SECS || 900} seconds ...`,
-	)
 	console.info(`> Signer address: ${signer.address}`)
-	setInterval(checkBalance, (CHECK_BALANCE_SECS || 900) * 1000)
 
 	// max acceptable gas price
 	if (MAX_GAS_PRICE_GWEI) {
 		console.info(`> Max gas price:  ${commas(MAX_GAS_PRICE_GWEI)} gwei`)
 	}
+
+	// check balance periodically
+	console.info(
+		`> Checking balance every ${CHECK_BALANCE_SECS || 900} seconds ...`,
+	)
+	setInterval(checkBalance, (CHECK_BALANCE_SECS || 900) * 1000)
 
 	// randomize upon startup:
 	console.info(`> Randomizing every ${HEARTBEAT_SECS} seconds ... `)
@@ -162,6 +160,7 @@ async function main() {
 					`  - Tx. cost:      ${ethers.formatEther(receipt.gasPrice * receipt.gasUsed + tx.value)} ${symbol}`,
 				)
 				return promisePoller({
+					interval: POLLING_MSECS,
 					taskFn: () =>
 						randomizer
 							.isRandomized(tx.blockNumber)
@@ -171,22 +170,23 @@ async function main() {
 								randomizeBlock: tx.blockNumber,
 							})),
 					shouldContinue: (err, result) => {
-						const { isRandomized, blockNumber, randomizeBlock } = result
 						if (err) {
 							console.info(err)
-						} else if (!isRandomized) {
+						
+						} else if (result && !result?.isRandomized) {
+							const { blockNumber, randomizeBlock } = result
 							const plus = Number(blockNumber) - Number(randomizeBlock)
 							if (randomizeWaitBlocks && plus > randomizeWaitBlocks) {
 								return false
+							
 							} else {
 								console.info(
 									`> Awaiting randomness for block ${commas(randomizeBlock)} ... T + ${commas(plus)}`,
 								)
 							}
 						}
-						return !isRandomized
+						return !result || !result.isRandomized;
 					},
-					interval: POLLING_MSECS,
 				}).then(async (result) => {
 					if (result.isRandomized) {
 						isRandomized = true
@@ -204,9 +204,7 @@ async function main() {
 						} else {
 							console.info(`  - Witnet result:    ${trails.uuid?.slice(2)}`)
 						}
-						console.info(
-							`  - Witnet timestamp: ${moment.unix(trails.timestamp)}`,
-						)
+						console.info(`  - Witnet timestamp: ${moment.unix(trails.timestamp)}`)
 					}
 					return result
 				})
