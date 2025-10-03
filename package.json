@@ -26,11 +26,11 @@
 		"web3"
 	],
 	"devDependencies": {
-		"@biomejs/biome": "^2.2.4"
+		"@biomejs/biome": "^2.2.5"
 	},
 	"dependencies": {
-		"@witnet/ethers": "^1.1.0",
-		"cross-env": "^10.0.0",
+		"@witnet/ethers": "^1.1.2",
+		"cross-env": "^10.1.0",
 		"dotenv": "^16.6.1",
 		"ethrpc-gateway": "^2.2.9",
 		"moment": "^2.30.1",
