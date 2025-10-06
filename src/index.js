@@ -159,15 +159,29 @@ async function main() {
 				console.info(
 					`  - Tx. cost:      ${ethers.formatEther(receipt.gasPrice * receipt.gasUsed + tx.value)} ${symbol}`,
 				)
+				const logs = await provider.getLogs({
+					address: randomizer.address,
+					fromBlock: receipt.blockNumber,
+					toBlock: receipt.blockNumber,
+				})
+				let randomizeBlock				
+				if (logs && logs[0]) {
+					if (logs[0].topics[0] === "0x8cb766b09215126141c41df86fd488fe4745f22f3c995c3ad9aaf4c07195b946") {
+						randomizeBlock = Number(logs[0].data.slice(0, 66))
+					}
+				} else {
+					randomizeBlock = Number(tx.blockNumber)
+				}
+				
 				return promisePoller({
 					interval: POLLING_MSECS,
 					taskFn: () =>
 						randomizer
-							.isRandomized(tx.blockNumber)
+							.isRandomized(randomizeBlock)
 							.then(async (isRandomized) => ({
 								isRandomized,
 								blockNumber: await provider.getBlockNumber(),
-								randomizeBlock: tx.blockNumber,
+								randomizeBlock,
 							})),
 					shouldContinue: (err, result) => {
 						if (err) {
@@ -175,7 +189,7 @@ async function main() {
 						
 						} else if (result && !result?.isRandomized) {
 							const { blockNumber, randomizeBlock } = result
-							const plus = Number(blockNumber) - Number(randomizeBlock)
+							const plus = Number(blockNumber) - Number(tx.blockNumber)
 							if (randomizeWaitBlocks && plus > randomizeWaitBlocks) {
 								return false
 							
@@ -190,9 +204,9 @@ async function main() {
 				}).then(async (result) => {
 					if (result.isRandomized) {
 						isRandomized = true
-						console.info(`> Randomized block ${commas(receipt.blockNumber)}:`)
+						console.info(`> Randomized block ${commas(randomizeBlock)}:`)
 						const trails = await randomizer.fetchRandomnessAfterProof(
-							receipt.blockNumber,
+							randomizeBlock
 						)
 						console.info(`  - Finality block:   ${commas(trails.finality)}`)
 						console.info(`  - Witnet DRT hash:  ${trails.trail?.slice(2)}`)
