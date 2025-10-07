@@ -2,7 +2,7 @@
 	"author": "Witnet Foundation",
 	"license": "MIT",
 	"name": "witnet-randomizer",
-	"version": "1.2.0",
+	"version": "1.2.1",
 	"description": "Randomizer bot for subsidizing unbiased randomness to EVM networks where the Wit/Oracle Framework is available.",
 	"main": "src/index.js",
 	"repository": {
