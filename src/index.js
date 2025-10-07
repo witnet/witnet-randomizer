@@ -1,3 +1,4 @@
+const cron = require("node-cron")
 require("dotenv").config()
 const moment = require("moment")
 const promisePoller = require("promise-poller").default
@@ -16,8 +17,10 @@ const commas = (number) => {
 const CHECK_BALANCE_SECS = process.env.RANDOMIZER_CHECK_BALANCE_SECS
 const CONFIRMATIONS = process.env.RANDOMIZER_CONFIRMATIONS || 2
 const MAX_GAS_PRICE_GWEI = process.env.RANDOMIZER_MAX_GAS_PRICE_GWEI
-const HEARTBEAT_SECS = process.env.RANDOMIZER_HEARTBEAT_SECS || 3600
 const MIN_BALANCE = process.env.RANDOMIZER_MIN_BALANCE || 0
+const NODE_CRON_OVERLAP = process.env.RANDDOMIZER_CRON_OVERLAP || true
+const NODE_CRON_SCHEDULE = process.env.RANDOMIZER_CRON_SCHEDULE || "0 0 9 * * 6" // default: every Saturday at 9.00 am
+const NODE_CRON_TIMEZONE = process.env.RANDOMIZER_CRON_TIMEZONE || "Europe/Madrid" // see: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 const NETWORK =
 	_spliceFromArgs(process.argv, `--network`) || process.env.RANDOMIZER_NETWORK
 const POLLING_MSECS = process.env.RANDOMIZER_POLLING_MSECS || 15000
@@ -93,16 +96,30 @@ async function main() {
 		console.info(`> Max gas price:  ${commas(MAX_GAS_PRICE_GWEI)} gwei`)
 	}
 
+	// validate schedule plan
+	if (!cron.validate(NODE_CRON_SCHEDULE)) {
+		console.error(
+			`> Fatal: invalid randomizing schedule: "${NODE_CRON_SCHEDULE}"`,
+		)
+		process.exit(1)
+	} else {
+		console.info(`> Randomizing schedule: "${NODE_CRON_SCHEDULE}" at ${NODE_CRON_TIMEZONE}`)
+		cron.schedule(
+			NODE_CRON_SCHEDULE, 
+			async () => randomize(),
+			{ 
+				noOverlap: !NODE_CRON_OVERLAP,
+				timezone: NODE_CRON_TIMEZONE 
+			}
+		);	
+	}
+
 	// check balance periodically
 	console.info(
 		`> Checking balance every ${CHECK_BALANCE_SECS || 900} seconds ...`,
 	)
 	setInterval(checkBalance, (CHECK_BALANCE_SECS || 900) * 1000)
-
-	// randomize upon startup:
-	console.info(`> Randomizing every ${HEARTBEAT_SECS} seconds ... `)
-	randomize()
-
+	
 	async function checkBalance() {
 		return provider
 			.getBalance(signer)
@@ -225,32 +242,23 @@ async function main() {
 			})
 			.then((result) => {
 				if (result.isRandomized) {
-					const elapsed = Date.now() - lastClock
-					const timeout = Math.max(0, HEARTBEAT_SECS * 1000 - elapsed)
-					console.info(
-						`> Waiting ${Number(timeout / 1000).toFixed(1)} seconds before next randomize ...`,
-					)
-					setTimeout(randomize, timeout)
+					console.info(`> Next randomizing schedule: "${NODE_CRON_SCHEDULE}" at ${NODE_CRON_TIMEZONE}`)
 				} else {
-					console.info(
-						`> Randomizing block ${commas(result.randomizeBlock)} is taking too long !!!`,
-					)
+					console.info(`> Randomizing block ${commas(result.randomizeBlock)} is taking too long !!!`)
+					// retry immediately a new randomize request
 					setTimeout(randomize, 0)
 				}
 			})
 			.catch((err) => {
 				console.error(err)
 				if (isRandomized) {
-					const elapsed = Date.now() - lastClock
-					const timeout = Math.max(0, HEARTBEAT_SECS * 1000 - elapsed)
-					console.info(
-						`> Waiting ${Number(timeout / 1000).toFixed(1)} seconds before next randomize ...`,
-					)
-					setTimeout(randomize, timeout)
+					console.info(`> Next randomizing schedule: "${NODE_CRON_SCHEDULE}" at ${NODE_CRON_TIMEZONE}`)
 				} else {
 					console.info(
 						`> Retrying in ${Math.floor(POLLING_MSECS / 1000)} seconds before next randomize ...`,
 					)
+					process.exit(1)
+					// retry immediately a new randomize request
 					setTimeout(randomize, POLLING_MSECS)
 				}
 			})
