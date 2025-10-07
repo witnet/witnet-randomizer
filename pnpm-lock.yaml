@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@witnet/ethers':
-        specifier: ^1.1.2
-        version: 1.1.2(@types/node@24.6.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        specifier: ^1.1.4
+        version: 1.1.4(@types/node@24.6.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       cross-env:
         specifier: ^10.1.0
         version: 10.1.0
@@ -18,8 +18,8 @@ importers:
         specifier: ^16.6.1
         version: 16.6.1
       ethrpc-gateway:
-        specifier: ^2.2.9
-        version: 2.2.9(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        specifier: ^2.2.10
+        version: 2.2.10(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       moment:
         specifier: ^2.30.1
         version: 2.30.1
@@ -387,8 +387,8 @@ packages:
   '@types/triple-beam@1.3.5':
     resolution: {integrity: sha512-6WaYesThRMCl19iryMYP7/x2OVgCtbIVflDGFpWnb9irXI3UjYE4AzmYuiUKY1AJstGijoY+MgUszMgRxIYTYw==}
 
-  '@witnet/ethers@1.1.2':
-    resolution: {integrity: sha512-rvSuUV15xPGyXZaxTOg+U7Ov8jqKV5bdhYC+A3T4MXBfjf8SQdjQ8uemtGWObsU+1jT86xstlzz/ATE45ni42A==}
+  '@witnet/ethers@1.1.4':
+    resolution: {integrity: sha512-7e7BofjjEEw4q8mUxfYRYuU4Y94ANldi7msdKv45NqWSG06xeG7liDmjvuS0yvWUGGA0+sJ8j9nDqNhQ+LIUyg==}
     hasBin: true
 
   '@witnet/sdk@1.1.1':
@@ -743,8 +743,8 @@ packages:
     resolution: {integrity: sha512-Kf/3ZW54L4UT0pZtsY/rf+EkBU7Qi5nnhonjUb8yTXcxH3cdcWrV2cRyk0Xk/4jK6OoHhxxZHriyhje20If2hQ==}
     engines: {node: '>=14.0.0'}
 
-  ethrpc-gateway@2.2.9:
-    resolution: {integrity: sha512-84U8U5S/BnJG4slwQZJQp5tbievt+FzjvafUc+vyK4rSvDT+nASNEWA4Zs3x8YSXBKYwmiBSl9VmPZWyPE1U9w==}
+  ethrpc-gateway@2.2.10:
+    resolution: {integrity: sha512-oEH5h+QqQuTatRH8DDjyuIr6Xlhezq/LH8CQX2EO3MfhHx0wIhXKLKJZr7YXEUH26kbLLdA6SVrvjehLMzSMwQ==}
     hasBin: true
 
   event-emitter@0.3.5:
@@ -1406,8 +1406,8 @@ packages:
     resolution: {integrity: sha512-NoBZauFNNWENgsnC9YpgyYwOVrl2m58PpQ8lNHjV3kosGs7KJ7Npk9pCUE+WJlawVSe8mykWDKWFSVfs3QO9ww==}
     engines: {node: '>= 12.0.0'}
 
-  witnet-solidity-bridge@2.2.2:
-    resolution: {integrity: sha512-RS8WVo05yglmd9Q97w4qeh4S7S3KbNbe2sppQJQBRvgXalkmjmtat77z1gphquVWfjgxt6utR3zytnmccGDMHw==}
+  witnet-solidity-bridge@2.2.7:
+    resolution: {integrity: sha512-fX7KsOR3Qj4j89ByL2qXbrjYh0yzRvHWZTsiLiQTraxw5C24mEhdos1+IcofdZ9TjoGgkI98Fk/cDD7IdC62NA==}
 
   wrap-ansi@6.2.0:
     resolution: {integrity: sha512-r6lPcBGxZXlIcymEu7InxDMhdW0KDxpLgoFLcguasxCaJ/SOIZwINatK9KY/tf+ZrlywOKU0UDj3ATXUBfxJXA==}
@@ -1940,7 +1940,7 @@ snapshots:
 
   '@types/triple-beam@1.3.5': {}
 
-  '@witnet/ethers@1.1.2(@types/node@24.6.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
+  '@witnet/ethers@1.1.4(@types/node@24.6.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
     dependencies:
       '@witnet/sdk': 1.1.1(@types/node@24.6.2)(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       axios: 1.12.2
@@ -1948,12 +1948,12 @@ snapshots:
       cross-env: 10.1.0
       dotenv: 16.6.1
       ethers: 6.15.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
-      ethrpc-gateway: 2.2.9(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      ethrpc-gateway: 2.2.10(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       inquirer: 8.2.7(@types/node@24.6.2)
       json-bigint: 1.0.0
       lodash.merge: 4.6.2
       moment: 2.30.1
-      witnet-solidity-bridge: 2.2.2
+      witnet-solidity-bridge: 2.2.7
     transitivePeerDependencies:
       - '@types/node'
       - bufferutil
@@ -2399,7 +2399,7 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  ethrpc-gateway@2.2.9(bufferutil@4.0.9)(utf-8-validate@5.0.10):
+  ethrpc-gateway@2.2.10(bufferutil@4.0.9)(utf-8-validate@5.0.10):
     dependencies:
       axios: 1.12.2
       cors: 2.8.5
@@ -3187,7 +3187,7 @@ snapshots:
       triple-beam: 1.4.1
       winston-transport: 4.9.0
 
-  witnet-solidity-bridge@2.2.2:
+  witnet-solidity-bridge@2.2.7:
     dependencies:
       dotenv: 16.6.1
       lodash.merge: 4.6.2
