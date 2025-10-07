@@ -181,13 +181,11 @@ async function main() {
 					fromBlock: receipt.blockNumber,
 					toBlock: receipt.blockNumber,
 				})
-				let randomizeBlock				
+				let randomizeBlock = Number(tx.blockNumber)			
 				if (logs && logs[0]) {
 					if (logs[0].topics[0] === "0x8cb766b09215126141c41df86fd488fe4745f22f3c995c3ad9aaf4c07195b946") {
 						randomizeBlock = Number(logs[0].data.slice(0, 66))
 					}
-				} else {
-					randomizeBlock = Number(tx.blockNumber)
 				}
 				
 				return promisePoller({
