@@ -255,7 +255,6 @@ async function main() {
 					console.info(
 						`> Retrying in ${Math.floor(POLLING_MSECS / 1000)} seconds before next randomize ...`,
 					)
-					process.exit(1)
 					// retry immediately a new randomize request
 					setTimeout(randomize, POLLING_MSECS)
 				}
